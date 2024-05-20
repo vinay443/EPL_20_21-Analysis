@@ -1,0 +1,158 @@
+---
+title: "Midterm Project"
+author: "Vinay Warrier"
+output: 
+  html_document: 
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Midterm Project
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+
+[**Render your final RMarkdown with answers in HTML format.**]{.underline}
+
+**Project Objective:** This midterm project aims to analyze a dataset to gain insights, make data-driven decisions, and present your findings clearly and informally. Through this project, you will demonstrate your understanding of key data science principles and tools.
+
+**Project Steps:**
+
+1.  **Choose a Dataset:** Select a dataset that is interesting to you and has potential for analysis. It could be related to any field, such as economics, social sciences, health, sports, or technology. Make sure the dataset is suitable for your skill level and project timeline.
+2.  **Data Acquisition:** Obtain the dataset from a reliable source. It could be sourced from public repositories, APIs, or provided by me. Ensure the data is in a format you can work with, such as CSV, Excel, or JSON.
+3.  **Data Cleaning:** Clean the dataset to handle missing values, outliers, and inconsistencies. This step is crucial as the quality of your analysis depends on the quality of your data. Document the cleaning steps you take.
+4.  **Exploratory Data Analysis (EDA):** Conduct exploratory analysis to understand the basic characteristics of the data. Calculate summary statistics, create visualizations (histograms, scatter plots, etc.), and identify patterns or trends.
+5.  **Interpretation and Conclusion:** Summarize your findings concisely and coherently. What insights did you gain from the data? How do your results address the initial objectives? Were there any unexpected discoveries?
+6.  **Project Report/Presentation:** Prepare a report or presentation that covers all the project steps. Include visuals, code snippets, and explanations to guide the reader through your process. Use precise language and avoid jargon.
+
+**Project Grading:** Your project will be graded based on the following:
+
+-   Data acquisition and preprocessing
+-   Quality of exploratory analysis
+-   Clarity and accuracy of visualizations
+-   Soundness of conclusions drawn
+-   Overall presentation and documentation
+
+Remember, data science is a blend of technical skills and domain knowledge coupled with the ability to communicate your findings effectively. This project aims to develop your skills in all these areas and provide you with a taste of what real-world data science involves.
+
+Good luck, and please get in touch with me at [hajoseph\@scarletmail.rutgers.edu](mailto:hajoseph@scarletmail.rutgers.edu) if you have any questions!
+
+```{r Starting, echo=TRUE, message=FALSE, warning=FALSE}
+ 
+#Start
+epl_data <- read.csv("EPL_20_21.csv")
+
+head(epl_data)
+
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
+```
+
+```{r Cleaning, echo=TRUE, message=FALSE, warning=FALSE}
+
+#Data Cleaning
+check_missing_values <- colSums(is.na(epl_data))
+
+check_missing_columns <- names(check_missing_values[check_missing_values > 0])
+check_missing_columns
+
+summary(epl_data)
+
+```
+
+```{r Sample Charts Section 1, echo=TRUE, message=FALSE, warning=FALSE}
+
+#Sample Charts 1
+
+hist(epl_data$Age, main = "Distribution of Age")
+
+plot(epl_data$Goals, epl_data$Assists, main = "Goals vs Assists")
+
+avg_goals <- mean(epl_data$Goals)
+avg_assists <- mean(epl_data$Assists)
+cat("On average, players scored", avg_goals, "goals and provided", avg_assists, "assists in the 2020-2021 EPL season.")
+
+cat("These statistics provide insights into the overall offensive performance of players, aligning with our objective to analyze player performance in the EPL.")
+
+high_scorer <- epl_data$Name[which.max(epl_data$Goals)]
+cat("Unexpectedly,", high_scorer, "emerged as the highest scorer in the dataset.")
+
+
+```
+
+```{r Sample Charts Section 2, echo=TRUE, message=FALSE, warning=FALSE}
+
+#Sample Charts 2
+
+scatter_passes_assists <- plot(epl_data$Passes_Attempted, epl_data$Assists, main = "Passes Attempted vs Assists", xlab = "Passes Attempted", ylab = "Assists")
+cat("The scatter plot shows a positive correlation between passes attempted and assists, suggesting that players who attempt more passes tend to have higher assist counts.")
+
+nationality_pie <- pie(table(epl_data$Nationality), main = "Nationality Distribution")
+cat("The pie chart visualizes the distribution of players based on nationality, reflecting the international diversity in the English Premier League.")
+
+age_density_plot <- plot(density(epl_data$Age), main = "Density Plot of Age")
+cat("The density plot showcases the distribution of player ages, with a peak around", round(mean(epl_data$Age), 2), "years. It provides insights into the age composition of players.")
+
+library(GGally)
+pair_plot <- ggpairs(epl_data[, c("Goals", "Assists", "Passes_Attempted", "Yellow_Cards")])
+pair_plot
+cat("The pair plot provides a comprehensive overview of pairwise relationships between key variables, helping identify patterns and potential outliers.")
+
+```
+
+```{r Histogram, echo=TRUE, message=FALSE, warning=FALSE}
+
+# 1
+passes_hist <- hist(epl_data$Passes_Attempted, main = "Distribution of Passes Attempted", xlab = "Passes Attempted")
+cat("The distribution of passes attempted by players shows", length(passes_hist$counts), "distinct intervals, indicating varying levels of player involvement in passing.")
+mean(epl_data$Passes_Attempted)
+median(epl_data$Passes_Attempted)
+getmode(epl_data$Passes_Attempted)
+
+```
+
+```{r Boxplot, echo=TRUE, message=FALSE, warning=FALSE}
+
+# 2
+goals_boxplot <- boxplot(epl_data$Goals, main = "Boxplot of Goals")
+cat("The box plot illustrates the spread of goal-scoring performances among players, with a median of", median(epl_data$Goals), "goals. It reveals the diversity in goal-scoring abilities.")
+median(epl_data$Goals)
+quantile(epl_data$Goals, probs = c(0,0.25,0.5,0.75,1)) 
+
+plot(epl_data$Matches, epl_data$Goals, type = "l", col = "blue", xlab = "Matches", ylab = "Goals", main = "Trend of Goals Over Matches")
+
+
+```
+
+```{r Table, echo=TRUE, message=FALSE, warning=FALSE}
+
+# 3
+position_counts <- table(epl_data$Position)
+barplot(position_counts, main = "Positional Distributions", xlab = "Position", ylab = "Number of Players", col = "lightcoral", border = "black")
+
+
+```
+
+```{r Heatmap, echo=TRUE, message=FALSE, warning=FALSE}
+
+#4
+
+cor_matrix <- cor(epl_data[, c("Goals", "Assists", "Passes_Attempted", "xG", "xA")])
+heatmap(cor_matrix, main = "Correlation Matrix Heatmap", col = colorRampPalette(c("blue", "white", "red"))(20), margins = c(10, 10))
+
+```
+
+```{r Table #2, echo=TRUE, message=FALSE, warning=FALSE}
+
+# 5
+yellow_red_counts <- table(epl_data$Yellow_Cards, epl_data$Red_Cards)
+barplot(yellow_red_counts, beside = TRUE, main = "Distribution of Yellow and Red Cards", xlab = "Number of Cards", ylab = "Number of Players", col = c("yellow", "red"), legend = TRUE)
+
+```
